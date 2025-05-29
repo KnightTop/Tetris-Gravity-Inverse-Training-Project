@@ -1,0 +1,65 @@
+[gd_scene load_steps=3 format=3 uid="uid://cpr5do1sweqr6"]
+
+[ext_resource type="Texture2D" uid="uid://cjonm1i556acs" path="res://src/Button.png" id="1_8jw7a"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_koa6r"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+border_width_left = 10
+border_width_top = 10
+border_width_right = 10
+border_width_bottom = 10
+border_color = Color(0.47788, 0.47788, 0.47788, 1)
+
+[node name="GravityVerseHUD" type="CanvasLayer"]
+
+[node name="NextPiecePanel" type="Panel" parent="."]
+offset_left = 863.0
+offset_top = 462.0
+offset_right = 1063.0
+offset_bottom = 612.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_koa6r")
+
+[node name="NextPieceLabel" type="Label" parent="."]
+offset_left = 875.0
+offset_top = 402.0
+offset_right = 1055.0
+offset_bottom = 447.0
+theme_override_font_sizes/font_size = 31
+text = "NEXT PIECE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GameOverLabel" type="Label" parent="."]
+offset_left = 570.0
+offset_top = 163.0
+offset_right = 799.0
+offset_bottom = 218.0
+theme_override_font_sizes/font_size = 40
+text = "Game Over!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ScoreLabel" type="Label" parent="."]
+offset_left = 650.0
+offset_top = 518.0
+offset_right = 837.0
+offset_bottom = 560.0
+theme_override_font_sizes/font_size = 30
+text = "Score: 0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StartButton" type="Button" parent="."]
+texture_filter = 1
+offset_left = 77.0
+offset_top = 508.0
+offset_right = 265.0
+offset_bottom = 566.0
+theme_override_colors/font_color = Color(0.173048, 0.159767, 0, 1)
+theme_override_colors/font_focus_color = Color(0.352389, 0.331326, 0, 1)
+theme_override_colors/font_pressed_color = Color(0.659013, 0.622097, 0, 1)
+theme_override_font_sizes/font_size = 30
+text = "New Game"
+icon = ExtResource("1_8jw7a")
+flat = true
+icon_alignment = 1
