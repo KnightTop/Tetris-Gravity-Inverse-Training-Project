@@ -1,0 +1,34 @@
+[gd_scene load_steps=6 format=3 uid="uid://dwhkg5ssil4vt"]
+
+[ext_resource type="Script" uid="uid://dtme2hjwhcylt" path="res://TileMap.cs" id="2_1n30v"]
+[ext_resource type="Texture2D" uid="uid://qdl6qaaf31qc" path="res://src/pentaminoes.png" id="2_03na7"]
+[ext_resource type="PackedScene" uid="uid://dvam3i5vr1qcl" path="res://hud.tscn" id="3_35kre"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_xftlc"]
+texture = ExtResource("2_03na7")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+5:0/0 = 0
+6:0/0 = 0
+7:0/0 = 0
+8:0/0 = 0
+9:0/0 = 0
+10:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_35kre"]
+tile_size = Vector2i(32, 32)
+sources/0 = SubResource("TileSetAtlasSource_xftlc")
+
+[node name="TileMap" type="TileMap"]
+tile_set = SubResource("TileSet_35kre")
+format = 2
+layer_0/name = "Board"
+layer_0/tile_data = PackedInt32Array(0, 655360, 0, 65536, 655360, 0, 131072, 655360, 0, 196608, 655360, 0, 262144, 655360, 0, 327680, 655360, 0, 393216, 655360, 0, 458752, 655360, 0, 524288, 655360, 0, 589824, 655360, 0, 655360, 655360, 0, 720896, 655360, 0, 786432, 655360, 0, 851968, 655360, 0, 917504, 655360, 0, 983040, 655360, 0, 1048576, 655360, 0, 1114112, 655360, 0, 1179648, 655360, 0, 1245184, 655360, 0, 1310720, 655360, 0, 1376256, 655360, 0, 1, 655360, 0, 1376257, 655360, 0, 2, 655360, 0, 1376258, 655360, 0, 3, 655360, 0, 1376259, 655360, 0, 4, 655360, 0, 1376260, 655360, 0, 5, 655360, 0, 1376261, 655360, 0, 6, 655360, 0, 1376262, 655360, 0, 7, 655360, 0, 1376263, 655360, 0, 8, 655360, 0, 1376264, 655360, 0, 9, 655360, 0, 1376265, 655360, 0, 10, 655360, 0, 1376266, 655360, 0, 11, 655360, 0, 65547, 655360, 0, 131083, 655360, 0, 196619, 655360, 0, 262155, 655360, 0, 327691, 655360, 0, 393227, 655360, 0, 458763, 655360, 0, 524299, 655360, 0, 589835, 655360, 0, 655371, 655360, 0, 720907, 655360, 0, 786443, 655360, 0, 851979, 655360, 0, 917515, 655360, 0, 983051, 655360, 0, 1048587, 655360, 0, 1114123, 655360, 0, 1179659, 655360, 0, 1245195, 655360, 0, 1310731, 655360, 0, 1376267, 655360, 0)
+layer_1/name = "Active"
+script = ExtResource("2_1n30v")
+
+[node name="HUD" parent="." instance=ExtResource("3_35kre")]
