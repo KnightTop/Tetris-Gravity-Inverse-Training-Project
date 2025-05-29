@@ -90,7 +90,7 @@ public partial class GravityVerseTileMap : Godot.TileMap
 	private Vector2I[][][] AShapesFull = [];
 	private Vector2I[][][] AShapes = [];
 
-	private const int COLLUMNS = 40;
+	private const int COLLUMNS = 42;
 	private const int ROWS = 10;
 
 	private Vector2I StartPosition = new Vector2I(21, 5);
@@ -101,7 +101,7 @@ public partial class GravityVerseTileMap : Godot.TileMap
 	private float Speed;
 	private const float ACCELERATION = 0.25f;
 	private int CurrentGravityDirection = 0;
-	private int RowsTillInverse=3;
+	private int RowsTillInverse = 3;
 
 	public Vector2I[][] PieceType;
 	public Vector2I[][] NextPieceType;
@@ -119,7 +119,15 @@ public partial class GravityVerseTileMap : Godot.TileMap
 	private int BoardLayer = 0;
 	private int ActiveLayer = 1;
 	[Export]
-	private CanvasLayer HUD;
+	public CanvasLayer HUD;
+	private float PauseLabelTimer = 1;
+	private bool IsGamePaused = false;
+	private bool IsGameOver = false;
+	[Export]
+	public Sprite2D BlueVector;
+	[Export]
+	public Sprite2D RedVector;
+
 
 
 	public override void _Ready()
@@ -142,8 +150,25 @@ public partial class GravityVerseTileMap : Godot.TileMap
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
+		if (Input.IsActionJustPressed("Pause") && !IsGameOver)
+		{
+			if (IsGameRunning == true)
+			{
+				IsGameRunning = false;
+				IsGamePaused = true;
+				HUD.GetNode<Label>("PauseLabel").Show();
+			}
+			else
+			{
+				IsGameRunning = true;
+				IsGamePaused = false;
+				HUD.GetNode<Label>("PauseLabel").Hide();
+
+			}
+		}
 		if (IsGameRunning)
 		{
+			HUD.GetNode<Label>("PauseLabel").Hide();
 			if (Input.IsActionPressed("Down"))
 			{
 				Steps[2] += 10;
@@ -152,7 +177,7 @@ public partial class GravityVerseTileMap : Godot.TileMap
 			{
 				Steps[3] += 10;
 			}
-			else if (Input.IsActionPressed("Left") && CurrentGravityDirection==0)
+			else if (Input.IsActionPressed("Left") && CurrentGravityDirection == 0)
 			{
 				Steps[0] += 10;
 			}
@@ -177,17 +202,20 @@ public partial class GravityVerseTileMap : Godot.TileMap
 		}
 
 
-
 	}
 	public void NewGame()
 	{
+		IsGameOver = false;
+		IsGamePaused = false;
 		IsGameRunning = true;
 		Score = 0;
 		Speed = 1.0f;
 		Steps = [0, 0, 0, 0];
-		CurrentGravityDirection=1;
+		CurrentGravityDirection = 0;
 		RowsTillInverse = 3;
-	HUD.GetNode<Label>("GameOverLabel").Hide();
+		HUD.GetNode<Label>("TillGravityInverseLabel").Text = "Rows Till Gravity Inverse: " + RowsTillInverse;
+		HUD.GetNode<Label>("GameOverLabel").Hide();
+		HUD.GetNode<Label>("PauseLabel").Hide();
 		ClearNextPiecePanel();
 		ClearBoard();
 		if (PieceType != null)
@@ -198,6 +226,8 @@ public partial class GravityVerseTileMap : Godot.TileMap
 		PieceAtlas = new Vector2I(PickColor(PieceType), 0);
 		NextPieceType = PickPiece();
 		NextPieceAtlas = new Vector2I(PickColor(NextPieceType), 0);
+		RedVector.Modulate = new Godot.Color(1, 1, 1);
+		BlueVector.Modulate = new Godot.Color(0.2f, 0.2f, 0.2f);
 		CreatePiece();
 	}
 	private Vector2I[][] PickPiece()
@@ -356,7 +386,7 @@ public partial class GravityVerseTileMap : Godot.TileMap
 	private void CheckRows()
 	{
 		var Collumn = 1;
-		while (Collumn < COLLUMNS+1)
+		while (Collumn < COLLUMNS + 1)
 		{
 			var count = 0;
 			for (int y = 0; y < ROWS; y++)
@@ -400,12 +430,13 @@ public partial class GravityVerseTileMap : Godot.TileMap
 				}
 			}
 		}
-		else{
+		else
+		{
 			for (int x = Collumn; x >= 20; x--)
 			{
 				for (int y = 1; y < ROWS; y++)
 				{
-					Atlas = GetCellAtlasCoords(BoardLayer, new Vector2I(x-1, y));
+					Atlas = GetCellAtlasCoords(BoardLayer, new Vector2I(x - 1, y));
 					if (Atlas == new Vector2I(-1, -1))
 					{
 						EraseCell(BoardLayer, new Vector2I(x, y));
@@ -418,18 +449,20 @@ public partial class GravityVerseTileMap : Godot.TileMap
 			}
 		}
 		RowsTillInverse--;
-		if(RowsTillInverse==0){
-			RowsTillInverse=3;
+		if (RowsTillInverse == 0)
+		{
+			RowsTillInverse = 3;
 			InverseGravity();
 		}
+		HUD.GetNode<Label>("TillGravityInverseLabel").Text = "Rows Till Gravity Inverse: " + RowsTillInverse;
 	}
 	private void ClearBoard()
 	{
-		for (int x = 0; x < COLLUMNS; x++)
+		for (int x = 1; x < COLLUMNS+1; x++)
 		{
-			for (int y = 0; y < ROWS; y++)
+			for (int y = 1; y < ROWS+1; y++)
 			{
-				EraseCell(BoardLayer, new Vector2I(x + 1, y + 1));
+				EraseCell(BoardLayer, new Vector2I(x, y));
 			}
 		}
 	}
@@ -442,13 +475,23 @@ public partial class GravityVerseTileMap : Godot.TileMap
 				LandPiece();
 				HUD.GetNode<Label>("GameOverLabel").Show();
 				IsGameRunning = false;
+				IsGameOver = true;
 			}
 		}
 	}
-	private void InverseGravity(){
-		CurrentGravityDirection+=1;
-		if(CurrentGravityDirection>1){
-			CurrentGravityDirection=0;
+	private void InverseGravity()
+	{
+		CurrentGravityDirection += 1;
+		if (CurrentGravityDirection > 1)
+		{
+			CurrentGravityDirection = 0;
+		}
+		if(CurrentGravityDirection==0){
+			RedVector.Modulate=new Godot.Color(1,1,1);
+			BlueVector.Modulate= new Godot.Color(0.2f, 0.2f, 0.2f);
+		}else{
+			RedVector.Modulate = new Godot.Color(0.2f, 0.2f, 0.2f);
+			BlueVector.Modulate = new Godot.Color(1, 1, 1);
 		}
 	}
 }

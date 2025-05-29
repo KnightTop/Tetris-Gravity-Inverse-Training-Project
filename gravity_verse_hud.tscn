@@ -30,20 +30,30 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="GameOverLabel" type="Label" parent="."]
-offset_left = 570.0
+offset_left = 582.0
 offset_top = 163.0
-offset_right = 799.0
+offset_right = 811.0
 offset_bottom = 218.0
 theme_override_font_sizes/font_size = 40
 text = "Game Over!"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="PauseLabel" type="Label" parent="."]
+offset_left = 591.0
+offset_top = 163.0
+offset_right = 820.0
+offset_bottom = 218.0
+theme_override_font_sizes/font_size = 40
+text = "Paused"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="ScoreLabel" type="Label" parent="."]
-offset_left = 650.0
-offset_top = 518.0
-offset_right = 837.0
-offset_bottom = 560.0
+offset_left = 640.0
+offset_top = 408.0
+offset_right = 827.0
+offset_bottom = 450.0
 theme_override_font_sizes/font_size = 30
 text = "Score: 0"
 horizontal_alignment = 1
@@ -51,10 +61,11 @@ vertical_alignment = 1
 
 [node name="StartButton" type="Button" parent="."]
 texture_filter = 1
-offset_left = 77.0
-offset_top = 508.0
-offset_right = 265.0
-offset_bottom = 566.0
+offset_left = 79.0
+offset_top = 398.0
+offset_right = 267.0
+offset_bottom = 456.0
+mouse_force_pass_scroll_events = false
 theme_override_colors/font_color = Color(0.173048, 0.159767, 0, 1)
 theme_override_colors/font_focus_color = Color(0.352389, 0.331326, 0, 1)
 theme_override_colors/font_pressed_color = Color(0.659013, 0.622097, 0, 1)
@@ -63,3 +74,14 @@ text = "New Game"
 icon = ExtResource("1_8jw7a")
 flat = true
 icon_alignment = 1
+
+[node name="TillGravityInverseLabel" type="Label" parent="."]
+offset_left = 505.0
+offset_top = 39.0
+offset_right = 891.0
+offset_bottom = 126.0
+theme_override_font_sizes/font_size = 30
+text = "Rows Till Gravity Inverse: 3
+"
+horizontal_alignment = 1
+vertical_alignment = 1
