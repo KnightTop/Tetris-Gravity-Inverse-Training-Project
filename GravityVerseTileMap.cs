@@ -71,12 +71,12 @@ public partial class GravityVerseTileMap : Godot.TileMap
 		new Vector2I[] { new(0, 1), new(1, 1), new(2, 1), new(2, 2), new(0,2) },  // C_180
 		new Vector2I[] { new(1, 0), new(1, 1), new(0, 2), new(1, 2), new(0,0) }   // C_270
 	};
-	private readonly Vector2I[][] D = new Vector2I[4][]
+	private readonly Vector2I[][] N = new Vector2I[4][]
 	{
-		new Vector2I[] { new(0, 0), new(1, 0), new(2, 0), new(0, 1), new(2,1),new(0, 2), new(1, 2), new(2, 2) },  // D_0
-		new Vector2I[] { new(0, 0), new(1, 0), new(2, 0), new(0, 1), new(2,1),new(0, 2), new(1, 2), new(2, 2) },  // D_90
-		new Vector2I[] { new(0, 0), new(1, 0), new(2, 0), new(0, 1), new(2,1),new(0, 2), new(1, 2), new(2, 2) },  // D_180
-		new Vector2I[] { new(0, 0), new(1, 0), new(2, 0), new(0, 1), new(2, 1), new(0, 2), new(1, 2), new(2, 2) } // D_270
+		new Vector2I[] { new(1, 0), new(2, 0), new(1, 1), new(1, 2), new(0,2)},  // N_0
+		new Vector2I[] { new(0, 0), new(0, 1), new(1, 1), new(2, 1), new(2,2)},  // N_90
+		new Vector2I[] { new(1, 0), new(2, 0), new(1, 1), new(1, 2), new(0,2)},  // N_180
+		new Vector2I[] { new(0, 0), new(0, 1), new(1, 1), new(2, 1), new(2, 2) } // N_270
 	};
 	private readonly Vector2I[][] X = new Vector2I[4][]
 {
@@ -117,7 +117,8 @@ public partial class GravityVerseTileMap : Godot.TileMap
 	private Vector2I NextPieceAtlas;
 
 	private int BoardLayer = 0;
-	private int ActiveLayer = 1;
+	private int ActiveLayer = 2;
+	private int ShadowLayer = 1;
 	[Export]
 	public CanvasLayer HUD;
 	private float PauseLabelTimer = 1;
@@ -140,7 +141,7 @@ public partial class GravityVerseTileMap : Godot.TileMap
 		AShapesFull = AShapesFull.Append(J).ToArray();
 		AShapesFull = AShapesFull.Append(L).ToArray();
 		AShapesFull = AShapesFull.Append(C).ToArray();
-		AShapesFull = AShapesFull.Append(D).ToArray();
+		AShapesFull = AShapesFull.Append(N).ToArray();
 		AShapesFull = AShapesFull.Append(X).ToArray();
 		AShapes = AShapesFull.Select(inner => inner.ToArray()).ToArray();
 		HUD.GetNode<Button>("StartButton").Pressed += NewGame;
@@ -211,7 +212,7 @@ public partial class GravityVerseTileMap : Godot.TileMap
 		Score = 0;
 		Speed = 1.0f;
 		Steps = [0, 0, 0, 0];
-		CurrentGravityDirection = 0;
+		CurrentGravityDirection = 1;
 		RowsTillInverse = 3;
 		HUD.GetNode<Label>("TillGravityInverseLabel").Text = "Rows Till Gravity Inverse: " + RowsTillInverse;
 		HUD.GetNode<Label>("GameOverLabel").Hide();
@@ -226,8 +227,7 @@ public partial class GravityVerseTileMap : Godot.TileMap
 		PieceAtlas = new Vector2I(PickColor(PieceType), 0);
 		NextPieceType = PickPiece();
 		NextPieceAtlas = new Vector2I(PickColor(NextPieceType), 0);
-		RedVector.Modulate = new Godot.Color(1, 1, 1);
-		BlueVector.Modulate = new Godot.Color(0.2f, 0.2f, 0.2f);
+		CheckGravityArrow();
 		CreatePiece();
 	}
 	private Vector2I[][] PickPiece()
@@ -301,7 +301,7 @@ public partial class GravityVerseTileMap : Godot.TileMap
 				CheckGameOver();
 			}
 		}
-
+		ShadowPieceLogic();
 	}
 	private void RotatePiece()
 	{
@@ -312,7 +312,7 @@ public partial class GravityVerseTileMap : Godot.TileMap
 			ActivePiece = PieceType[RotationIndex];
 			DrawPiece(ActivePiece, CurrentPosition, PieceAtlas);
 		}
-
+		ShadowPieceLogic();
 	}
 	private void LandPiece()
 	{
@@ -320,6 +320,36 @@ public partial class GravityVerseTileMap : Godot.TileMap
 		{
 			EraseCell(ActiveLayer, CurrentPosition + ActivePiece[f]);
 			SetCell(BoardLayer, CurrentPosition + ActivePiece[f], TileId, PieceAtlas);
+		}
+	}
+	private void ShadowPieceLogic()
+	{
+		ClearShadowBoard();
+		var shadowPos = new Vector2I(CurrentPosition.X, CurrentPosition.Y);
+		if (CurrentGravityDirection == 0)
+		{
+			for (; shadowPos.X > -2; shadowPos.X--)
+			{
+				if (!CanShadowMove(shadowPos))
+				{
+					GD.Print(shadowPos, "POS");
+					DrawShadowPiece(ActivePiece, new Vector2I(shadowPos.X + 1, shadowPos.Y), PieceAtlas);
+					break;
+				}
+			}
+		}
+		else
+		{
+			for (; shadowPos.X <= 45; shadowPos.X++)
+			{
+				if (!CanShadowMove(shadowPos))
+				{
+					GD.Print(shadowPos, "POS");
+					DrawShadowPiece(ActivePiece, new Vector2I(shadowPos.X - 1, shadowPos.Y), PieceAtlas);
+					break;
+				}//1408
+			}
+
 		}
 	}
 	private bool CanMove(Vector2I dir)
@@ -331,6 +361,19 @@ public partial class GravityVerseTileMap : Godot.TileMap
 			{
 				CanMove = false;
 			}
+		}
+		return CanMove;
+	}
+	private bool CanShadowMove(Vector2I dir)
+	{
+		bool CanMove = true;
+		for (int i = 0; i < ActivePiece.Length; i++)
+		{
+			if (!IsCellFree(ActivePiece[i] + dir))
+			{
+				CanMove = false;
+			}
+			GD.Print(ActivePiece[i] + dir, "CANMOVE");
 		}
 		return CanMove;
 	}
@@ -366,6 +409,14 @@ public partial class GravityVerseTileMap : Godot.TileMap
 			SetCell(ActiveLayer, Pos + Piece[i], TileId, Atlas);
 		}
 	}
+	private void DrawShadowPiece(Vector2I[] Piece, Vector2I Pos, Vector2I Atlas)
+	{
+		for (int i = 0; i < Piece.Length; i++)
+		{
+			SetCell(ShadowLayer, Pos + Piece[i], TileId, Atlas);
+		}
+	}
+
 	private void ClearPiece(Vector2I[] Piece, Vector2I Pos)
 	{
 		for (int i = 0; i < Piece.Length; i++)
@@ -458,11 +509,21 @@ public partial class GravityVerseTileMap : Godot.TileMap
 	}
 	private void ClearBoard()
 	{
-		for (int x = 1; x < COLLUMNS+1; x++)
+		for (int x = 1; x < COLLUMNS + 1; x++)
 		{
-			for (int y = 1; y < ROWS+1; y++)
+			for (int y = 1; y < ROWS + 1; y++)
 			{
 				EraseCell(BoardLayer, new Vector2I(x, y));
+			}
+		}
+	}
+	private void ClearShadowBoard()
+	{
+		for (int x = 0; x < COLLUMNS + 1; x++)
+		{
+			for (int y = 0; y < ROWS + 1; y++)
+			{
+				EraseCell(ShadowLayer, new Vector2I(x, y));
 			}
 		}
 	}
@@ -486,10 +547,17 @@ public partial class GravityVerseTileMap : Godot.TileMap
 		{
 			CurrentGravityDirection = 0;
 		}
-		if(CurrentGravityDirection==0){
-			RedVector.Modulate=new Godot.Color(1,1,1);
-			BlueVector.Modulate= new Godot.Color(0.2f, 0.2f, 0.2f);
-		}else{
+		CheckGravityArrow();
+	}
+	private void CheckGravityArrow()
+	{
+		if (CurrentGravityDirection == 0)
+		{
+			RedVector.Modulate = new Godot.Color(1, 1, 1);
+			BlueVector.Modulate = new Godot.Color(0.2f, 0.2f, 0.2f);
+		}
+		else
+		{
 			RedVector.Modulate = new Godot.Color(0.2f, 0.2f, 0.2f);
 			BlueVector.Modulate = new Godot.Color(1, 1, 1);
 		}
